@@ -11,7 +11,7 @@ export default defineConfig({
   //     entryRoot: './src',
   //     // skipDiagnostics: false,
   //   }),
-  // ],
+  // ],'path', 'fs'
   build: {
     // sourcemap: true,
     lib: {
@@ -23,6 +23,7 @@ export default defineConfig({
     rollupOptions: {
       // external: [...Object.keys(packagejson.dependencies), 'path'],
       external: [...Object.keys(packagejson.dependencies), 'path', 'fs'],
+      // external: [...Object.keys(packagejson.dependencies), /^node:/],
       // external: Object.keys(packagejson.dependencies),
       // plugins: [nodeResolve()],
     },

@@ -5,7 +5,7 @@ import { run } from '../run'
 describe('Name of the group', () => {
   // const writeMock = vi.fn()
   const { log } = console
-  vi.mock('write', () => ({ default: vi.fn() }))
+  vi.mock('write', () => ({ default: vi.fn(async (_, val) => val) }))
   const logSpy = vi.spyOn(console, 'log')
 
   afterEach(() => {
