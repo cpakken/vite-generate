@@ -3,13 +3,13 @@
   "version": "0.0.1",
   "main": "src/index.ts",
   "bin": {
-    "vite-generate": "./dist/vite-generate.es.js"
+    "vite-generate": "./dist/vite-generate.cjs.js"
   },
   "scripts": {
     "dev": "vite --port 3001",
     "build": "vite build",
     "test": "vitest --globals",
-    "json": "vite-generate --config ./src/tests/vite.test.config.ts"
+    "generate": "vite-generate --config ./src/tests/vite.test.config.ts"
   },
   "devDependencies": {
     "@rollup/plugin-node-resolve": "^13.3.0",

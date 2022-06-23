@@ -1,9 +1,9 @@
-import { createServer, ViteDevServer } from 'vite'
-import path from 'path'
-import write from 'write'
 import chalk from 'chalk'
+import path from 'path'
+import { createServer, ViteDevServer } from 'vite'
+import write from 'write'
+import { createViteConfigGenerate } from './create-vite-config-generate'
 import { GenerateEntry, GenerateJSONConfig } from './types'
-import { prepareViteConfigForGenerate } from './plugin'
 
 type EventName = 'add' | 'addDir' | 'change' | 'unlink' | 'unlinkDir'
 type GenerateOptions = {
@@ -15,10 +15,12 @@ export async function run(options: GenerateOptions = { watch: false }) {
   // const viteConfig = config.vite && { ...config.vite, configFile: false }
   const { config, watch } = options
 
-  const viteServer = await createServer({
-    ...(config && { configFile: path.resolve(process.cwd(), config) }),
-    plugins: [prepareViteConfigForGenerate()],
-  })
+  // const viteServer = await createServer({
+  //   ...(config && { configFile: path.resolve(process.cwd(), config) }),
+  //   plugins: [prepareViteConfigForGenerate()],
+  // })
+
+  const viteServer = await createServer(await createViteConfigGenerate(config || 'vite.config.ts'))
 
   const { entries } = (viteServer.config as any).generate as GenerateJSONConfig
 
@@ -72,8 +74,7 @@ function createGenerateProcessor(viteServer: ViteDevServer, entries: GenerateEnt
 
                 prev[name] = result
                 // await write(path.resolve(process.cwd(), outPath), JSON.stringify(result))
-                const p = await write(path.resolve(process.cwd(), outPath), JSON.stringify(result))
-                console.log({ p })
+                await write(path.resolve(process.cwd(), outPath), JSON.stringify(result))
               }
             })
           )

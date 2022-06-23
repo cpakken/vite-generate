@@ -1,6 +1,9 @@
 import { defineGenerateConfig } from '../types'
 
 export default defineGenerateConfig({
+  resolve: {
+    dedupe: ['mobx'],
+  },
   generate: {
     entries: [
       {

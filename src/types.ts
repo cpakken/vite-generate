@@ -7,7 +7,7 @@ export type GenerateEntry = {
 
 export type GenerateJSONConfig = {
   entries: GenerateEntry[]
-  viteFinal?: (viteConfig: UserConfig) => UserConfig
+  viteConfig?: (viteConfig: UserConfig) => UserConfig
 }
 
 export type UserConfigWithGenerate = UserConfig & { generate: GenerateJSONConfig }
