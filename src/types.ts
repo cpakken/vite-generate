@@ -1,5 +1,19 @@
 import type { ConfigEnv, UserConfig } from 'vite'
 
+// module.exports = [
+//   {
+//     input: 'src/manifest/manifest.v2.ts',
+//     output: {
+//       dev: '$PATH/lib/manifest.v2.dev.json',
+//       prod: '$PATH/lib/manifest.v2.prod.json',
+//     },
+//   },
+//   {
+//     input: 'src/manifest/manifest.v3.ts',
+//     output: 'src/manifest/lib/manifest.v3.json',
+//   },
+// ]
+
 export type GenerateEntry = {
   input: string
   output: string | Record<string, string>
@@ -19,17 +33,3 @@ export type UserConfigExportWithGenerate =
 export function defineGenerateConfig(config: UserConfigExportWithGenerate): UserConfigExportWithGenerate {
   return config
 }
-
-// module.exports = [
-//   {
-//     input: 'src/manifest/manifest.v2.ts',
-//     output: {
-//       dev: '$PATH/lib/manifest.v2.dev.json',
-//       prod: '$PATH/lib/manifest.v2.prod.json',
-//     },
-//   },
-//   {
-//     input: 'src/manifest/manifest.v3.ts',
-//     output: 'src/manifest/lib/manifest.v3.json',
-//   },
-// ]

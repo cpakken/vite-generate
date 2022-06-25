@@ -18,7 +18,7 @@ export async function createViteConfigGenerate(viteConfigPath: string): Promise<
     ...configFinal,
     generate,
     logLevel: 'silent',
-    cacheDir: 'node_modules/.generate-json',
+    cacheDir: 'node_modules/.vite-generate',
     server: { middlewareMode: 'ssr' },
     build: {
       //https://vitejs.dev/config/#optimizedeps-entries

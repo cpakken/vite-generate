@@ -1,18 +1,21 @@
 {
-  "name": "@cpk/vite-generate",
+  "name": "vite-generate",
   "version": "0.0.1",
-  "main": "src/index.ts",
+  "main": "dist/vite-generate.cjs.js",
+  "module": "dist/vite-generate.es.js",
+  "types": "./dist/types/index.d.ts",
   "bin": {
-    "vite-generate": "./dist/vite-generate.cjs.js"
+    "vite-generate": "./dist/vite-generate.bin.cjs.js"
   },
   "scripts": {
     "dev": "vite --port 3001",
-    "build": "vite build",
+    "//build": "vite build",
+    "build": "vite build && pnpm build:bin",
+    "build:bin": "vite build --config vite.config.bin.ts",
     "test": "vitest --globals",
-    "generate": "vite-generate --config ./src/tests/vite.test.config.ts"
+    "generate": "node ./dist/vite-generate.bin.cjs.js --config ./src/tests/vite.test.config.ts"
   },
   "devDependencies": {
-    "@rollup/plugin-node-resolve": "^13.3.0",
     "@types/write": "^2.0.1",
     "vite-plugin-dts": "^1.2.0",
     "vitest": "^0.15.2",

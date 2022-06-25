@@ -12,15 +12,12 @@ type GenerateOptions = {
 }
 
 export async function run(options: GenerateOptions = { watch: false }) {
-  // const viteConfig = config.vite && { ...config.vite, configFile: false }
   const { config, watch } = options
 
-  // const viteServer = await createServer({
-  //   ...(config && { configFile: path.resolve(process.cwd(), config) }),
-  //   plugins: [prepareViteConfigForGenerate()],
-  // })
+  const resolvedConfig = await createViteConfigGenerate(config || 'vite.config.ts')
 
-  const viteServer = await createServer(await createViteConfigGenerate(config || 'vite.config.ts'))
+  console.log('loading vite-generate...')
+  const viteServer = await createServer(resolvedConfig)
 
   const { entries } = (viteServer.config as any).generate as GenerateJSONConfig
 
@@ -41,50 +38,71 @@ function createGenerateProcessor(viteServer: ViteDevServer, entries: GenerateEnt
   const prev: Record<string, any> = {}
 
   return (eventName?: EventName, changedPath?: string) => {
-    return Promise.all(
-      entries.map(async ({ input, output }) => {
-        try {
-          const outputs = typeof output === 'string' ? { default: output } : output
+    const processEntry = async ({ input, output }: GenerateEntry): Promise<void[] | undefined> => {
+      try {
+        const inputPath = path.resolve(process.cwd(), input)
+        const ssrModule = await viteServer.ssrLoadModule(inputPath)
 
-          const inputPath = path.resolve(process.cwd(), input)
-          const ssrModule = await viteServer.ssrLoadModule(inputPath)
+        const outputs = typeof output === 'string' ? { default: output } : output
 
-          return Promise.all(
-            Object.entries(outputs).map(async ([name, out]) => {
-              const outPath = out.replace(/^\$PATH/, path.dirname(inputPath))
-              const result = ssrModule[name]
+        const processOutput = async ([name, out]: [string, string]): Promise<void> => {
+          const outPath = out.replace(/^\$PATH/, path.dirname(inputPath))
+          const result = ssrModule[name]
 
-              const inputRel = chalk.magentaBright(relPath(inputPath))
-              const outRel = chalk.magentaBright(relPath(outPath))
+          const inputRel = chalk.magentaBright(relPath(inputPath))
+          const outRel = chalk.magentaBright(relPath(outPath))
 
-              //Build only if the manifest has changed
-              if (prev[name] !== result) {
-                if (eventName) {
-                  //From Change
-                  const changedPathRel = relPath(changedPath!)
+          //Build only if the manifest has changed
+          if (prev[name] !== result) {
+            if (eventName) {
+              //From Change
+              const changedPathRel = relPath(changedPath!)
 
-                  console.log(
-                    `${chalk.yellow(eventName)}: ${changedPathRel},\
-                 rebuilding ${inputRel}:${chalk.blue(name)} to ${outRel}`
-                  )
-                } else {
-                  //From Build
-                  console.log(`building ${inputRel}:${chalk.blue(name)} to ${outRel}`)
-                }
+              console.log(
+                `${chalk.yellow(eventName)}: ${changedPathRel},\
+                     rebuilding ${inputRel}:${chalk.blue(name)} to ${outRel}`
+              )
+            } else {
+              //From Build
+              console.log(`building ${inputRel}:${chalk.blue(name)} to ${outRel}`)
+            }
 
-                prev[name] = result
-                // await write(path.resolve(process.cwd(), outPath), JSON.stringify(result))
-                await write(path.resolve(process.cwd(), outPath), JSON.stringify(result))
-              }
-            })
-          )
-        } catch (e) {
-          viteServer.ssrFixStacktrace(e as Error)
-          console.error(e)
+            prev[name] = result
+
+            const resolved = await resolveResult(result)
+            await write(path.resolve(process.cwd(), outPath), serializeResult(resolved))
+
+            // await write(path.resolve(process.cwd(), outPath), JSON.stringify(result))
+          }
         }
-      })
-    )
+
+        return Promise.all(Object.entries(outputs).map(processOutput))
+      } catch (e) {
+        viteServer.ssrFixStacktrace(e as Error)
+        console.error(e)
+      }
+    }
+
+    return Promise.all(entries.map(processEntry))
   }
+}
+
+function isPromiseLike<T>(thing: T): thing is Extract<T, PromiseLike<any>> {
+  return thing && typeof (thing as any).then === 'function'
+}
+
+async function resolveResult<T>(result: T | (() => T | Promise<T>)) {
+  if (result instanceof Function) {
+    const resolved = result()
+    return isPromiseLike(resolved) ? await resolved : resolved
+  } else {
+    return result
+  }
+}
+
+//Apply formating / output raw etc / json5 / superjson / custom format function
+function serializeResult(result: any, options?: any) {
+  return JSON.stringify(result)
 }
 
 function relPath(p: string) {
