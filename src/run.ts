@@ -1,4 +1,4 @@
-import chalk from 'chalk'
+import pc from 'picocolors'
 import path from 'path'
 import { createServer, ViteDevServer } from 'vite'
 import write from 'write'
@@ -50,8 +50,8 @@ function createGenerateProcessor(viteServer: ViteDevServer, entries: GenerateEnt
           const outPath = out.replace(/^\$PATH/, path.dirname(inputPath))
           const result = ssrModule[name]
 
-          const inputRel = chalk.magentaBright(relPath(inputPath))
-          const outRel = chalk.magentaBright(relPath(outPath))
+          const inputRel = pc.magenta(relPath(inputPath))
+          const outRel = pc.magenta(relPath(outPath))
 
           //Build only if the manifest has changed
           if (prev[name] !== result) {
@@ -60,12 +60,12 @@ function createGenerateProcessor(viteServer: ViteDevServer, entries: GenerateEnt
               const changedPathRel = relPath(changedPath!)
 
               console.log(
-                `${chalk.yellow(eventName)}: ${changedPathRel},\
-                     rebuilding ${inputRel}:${chalk.blue(name)} to ${outRel}`
+                `${pc.yellow(eventName)}: ${changedPathRel},\
+                     rebuilding ${inputRel}:${pc.blue(name)} to ${outRel}`
               )
             } else {
               //From Build
-              console.log(`building ${inputRel}:${chalk.blue(name)} to ${outRel}`)
+              console.log(`building ${inputRel}:${pc.blue(name)} to ${outRel}`)
             }
 
             prev[name] = result
