@@ -1,4 +1,4 @@
-import { defineGenerateConfig } from '../types'
+import { defineGenerateConfig } from '../define'
 
 export default defineGenerateConfig({
   resolve: {

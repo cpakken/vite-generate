@@ -3,7 +3,7 @@ import path from 'path'
 import { createServer, ViteDevServer } from 'vite'
 import write from 'write'
 import { createViteConfigGenerate } from './create-vite-config-generate'
-import { GenerateEntry, GenerateJSONConfig } from './types'
+import { GenerateEntry, GenerateJSONConfig } from './define'
 
 type EventName = 'add' | 'addDir' | 'change' | 'unlink' | 'unlinkDir'
 type GenerateOptions = {
@@ -71,8 +71,7 @@ function createGenerateProcessor(viteServer: ViteDevServer, entries: GenerateEnt
 
             const resolved = await resolveResult(result)
             await write(path.resolve(process.cwd(), outPath), serializeResult(resolved))
-
-            // await write(path.resolve(process.cwd(), outPath), JSON.stringify(result))
+            // await write(path.resolve(process.cwd(), outPath), serializeResult(resolved), { overwrite: true })
           }
         }
 

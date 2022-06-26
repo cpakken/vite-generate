@@ -1,6 +1,6 @@
 import path from 'path'
 import { loadConfigFromFile } from 'vite'
-import type { UserConfigWithGenerate } from './types'
+import { UserConfigWithGenerate } from './define'
 
 export async function createViteConfigGenerate(viteConfigPath: string): Promise<UserConfigWithGenerate> {
   const mode = process.env.NODE_ENV === 'production' ? 'production' : 'development'

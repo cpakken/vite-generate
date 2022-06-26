@@ -1,29 +1,29 @@
 {
   "name": "vite-generate",
   "version": "0.0.1",
-  "main": "dist/vite-generate.cjs.js",
-  "module": "dist/vite-generate.es.js",
-  "types": "./dist/types/index.d.ts",
+  "main": "dist/cjs/index.cjs.js",
+  "module": "dist/es/index.es.js",
+  "types": "dist/types/index.d.ts",
   "bin": {
-    "vite-generate": "./dist/vite-generate.bin.cjs.js"
+    "vite-generate": "dist/cjs/vite-generate.bin.cjs.js"
   },
   "scripts": {
     "dev": "vite --port 3001",
-    "//build": "vite build",
-    "build": "vite build && pnpm build:bin",
-    "build:bin": "vite build --config vite.config.bin.ts",
+    "build": "vite build",
+    "//build": "vite build && pnpm build:bin",
+    "//build:bin": "vite build --config vite.config.bin.ts",
     "test": "vitest --globals",
-    "generate": "node ./dist/vite-generate.bin.cjs.js --config ./src/tests/vite.test.config.ts"
+    "generate": "vite-generate --config ./src/tests/vite.test.config.ts"
   },
   "devDependencies": {
     "@types/write": "^2.0.1",
     "vite-plugin-dts": "^1.2.0",
-    "vitest": "^0.15.2",
-    "write": "^2.0.0"
+    "vitest": "^0.16.0"
   },
   "dependencies": {
     "chalk": "4",
     "commander": "^9.3.0",
-    "vite": "^2.7.3"
+    "vite": "^2.7.3",
+    "write": "^2.0.0"
   }
 }
