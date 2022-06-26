@@ -15,7 +15,7 @@ export default defineConfig({
     lib: { entry: 'src/index.ts', name: 'vite-generate' },
     rollupOptions: {
       input: {
-        'vite-generate.bin': 'src/vite-generate.ts',
+        'vite-generate.bin': 'src/bin.ts',
         index: 'src/index.ts',
       },
       output: [
