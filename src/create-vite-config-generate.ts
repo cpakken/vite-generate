@@ -1,10 +1,15 @@
-import path from 'path'
+import { resolve, relative } from 'path'
 import { loadConfigFromFile } from 'vite'
 import { UserConfigWithGenerate } from './define'
 
+const cwd = process.cwd()
+export const resolveCwd = (p: string) => resolve(cwd, p)
+const relativeCwd = (p: string) => relative(cwd, resolveCwd(p))
+
 export async function createViteConfigGenerate(viteConfigPath: string): Promise<UserConfigWithGenerate> {
   const mode = process.env.NODE_ENV === 'production' ? 'production' : 'development'
-  const resolvedPath = path.resolve(process.cwd(), viteConfigPath)
+  const resolvedPath = resolveCwd(viteConfigPath)
+
   const { config } = (await loadConfigFromFile({ command: 'serve', mode }, resolvedPath)) || { config: {} }
 
   const { generate, ...userConfig } = config as UserConfigWithGenerate
@@ -14,17 +19,16 @@ export async function createViteConfigGenerate(viteConfigPath: string): Promise<
 
   const configFinal = viteConfig ? viteConfig(userConfig) : userConfig
 
+  const optimizedEntries = entries.map(({ input }) => relativeCwd(input))
+  // console.log({ optimizedEntries })
+
   return {
     ...configFinal,
     generate,
-    logLevel: 'silent',
+    // logLevel: 'silent',
+    logLevel: 'info',
     cacheDir: 'node_modules/.vite-generate',
     server: { middlewareMode: 'ssr' },
-    build: {
-      //https://vitejs.dev/config/#optimizedeps-entries
-      rollupOptions: {
-        input: entries.map(({ input }) => path.resolve(process.cwd(), input)),
-      },
-    },
+    optimizeDeps: { entries: optimizedEntries },
   }
 }

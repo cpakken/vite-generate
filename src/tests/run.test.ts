@@ -20,6 +20,7 @@ describe('Name of the group', () => {
   test('run', async () => {
     const config = path.resolve(__dirname, './vite.test.config.ts')
     await run({ config })
+
     // log('sdf', (write as any).mock.calls)
     expect(writeMock.mock.calls.map((call) => call[1])).toEqual([JSON.stringify(foo)])
   })

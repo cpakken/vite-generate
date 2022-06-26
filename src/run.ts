@@ -2,7 +2,7 @@ import chalk from 'chalk'
 import path from 'path'
 import { createServer, ViteDevServer } from 'vite'
 import write from 'write'
-import { createViteConfigGenerate } from './create-vite-config-generate'
+import { createViteConfigGenerate, resolveCwd } from './create-vite-config-generate'
 import { GenerateEntry, GenerateJSONConfig } from './define'
 
 type EventName = 'add' | 'addDir' | 'change' | 'unlink' | 'unlinkDir'
@@ -40,7 +40,7 @@ function createGenerateProcessor(viteServer: ViteDevServer, entries: GenerateEnt
   return (eventName?: EventName, changedPath?: string) => {
     const processEntry = async ({ input, output }: GenerateEntry): Promise<void[] | undefined> => {
       try {
-        const inputPath = path.resolve(process.cwd(), input)
+        const inputPath = resolveCwd(input)
         const ssrModule = await viteServer.ssrLoadModule(inputPath)
 
         const outputs = typeof output === 'string' ? { default: output } : output
@@ -70,8 +70,7 @@ function createGenerateProcessor(viteServer: ViteDevServer, entries: GenerateEnt
             prev[name] = result
 
             const resolved = await resolveResult(result)
-            await write(path.resolve(process.cwd(), outPath), serializeResult(resolved))
-            // await write(path.resolve(process.cwd(), outPath), serializeResult(resolved), { overwrite: true })
+            await write(resolveCwd(outPath), serializeResult(resolved))
           }
         }
 
